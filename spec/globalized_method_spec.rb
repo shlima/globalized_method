@@ -61,7 +61,7 @@ RSpec.describe GlobalizedMethod do
     end
   end
 
-  describe '#name with fallbacks' do
+  describe '#name with fallbacks hash' do
     context 'when fallbacks empty' do
       let(:klass) do
         Class.new do
@@ -107,6 +107,40 @@ RSpec.describe GlobalizedMethod do
         I18n.with_locale(:ru) do
           expect(subject.name).to eq('NAME_EN')
         end
+      end
+    end
+  end
+
+  describe '#name with fallbacks in a block' do
+    let(:klass) do
+      Class.new do
+        include GlobalizedMethod
+
+        globalized_method :name, fallbacks: ->(model) do
+          model.name_int
+        end
+
+        def name_ru
+          nil
+        end
+
+        def name_en
+          'NAME_EN'
+        end
+
+        def name_int
+          'NAME_INT'
+        end
+      end
+    end
+
+    it 'works' do
+      I18n.with_locale(:ru) do
+        expect(subject.name).to eq('NAME_INT')
+      end
+
+      I18n.with_locale(:en) do
+        expect(subject.name).to eq('NAME_EN')
       end
     end
   end

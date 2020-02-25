@@ -15,7 +15,13 @@ GlobalizedMethod.fallbacks[:ru] = %i[en]
 class Item < ApplicationRecord # or BasicObject (works the same)
   include GlobalizedMethod
   
+  # 1)
   globalized_method :name, fallbacks: { ru: %i[en] }
+  
+  # 2)
+  globalized_method :name, fallbacks: ->(record) do
+    record.name_international 
+  end
   
   def name_en
     'some name'
