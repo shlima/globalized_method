@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    globalized_method (0.1.0)
+    globalized_method (0.1.1)
       activesupport
 
 GEM
