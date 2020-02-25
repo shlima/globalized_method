@@ -50,14 +50,64 @@ RSpec.describe GlobalizedMethod do
   end
 
   describe '#name' do
-     it 'returns method result in current locale' do
-       I18n.with_locale(:en) do
-         expect(subject.name).to eq('NAME_EN')
-       end
+    it 'returns method result in current locale' do
+      I18n.with_locale(:en) do
+        expect(subject.name).to eq('NAME_EN')
+      end
 
-       I18n.with_locale(:ru) do
-         expect(subject.name).to eq('NAME_RU')
-       end
-     end
+      I18n.with_locale(:ru) do
+        expect(subject.name).to eq('NAME_RU')
+      end
+    end
+  end
+
+  describe '#name with fallbacks' do
+    context 'when fallbacks empty' do
+      let(:klass) do
+        Class.new do
+          include GlobalizedMethod
+
+          globalized_method :name
+
+          def name_ru
+            nil
+          end
+
+          def name_en
+            'NAME_EN'
+          end
+        end
+      end
+
+      it 'returns nil' do
+        I18n.with_locale(:ru) do
+          expect(subject.name).to eq(nil)
+        end
+      end
+    end
+
+    context 'when fallbacks exists' do
+      let(:klass) do
+        Class.new do
+          include GlobalizedMethod
+
+          globalized_method :name, fallbacks: { ru: %i[en] }
+
+          def name_ru
+            nil
+          end
+
+          def name_en
+            'NAME_EN'
+          end
+        end
+      end
+
+      it 'returns fallback' do
+        I18n.with_locale(:ru) do
+          expect(subject.name).to eq('NAME_EN')
+        end
+      end
+    end
   end
 end

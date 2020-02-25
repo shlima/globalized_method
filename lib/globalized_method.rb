@@ -2,9 +2,17 @@
 
 require 'globalized_method/version'
 require 'active_support/concern'
+require 'active_support/core_ext'
 
 module GlobalizedMethod
   extend ActiveSupport::Concern
+
+  # @example GlobalizedMethod.fallbacks[:uk] = %i[ru en]
+  def fallbacks
+    @fallbacks ||= {}
+  end
+
+  module_function :fallbacks
 
   class_methods do
     #  # @return [Symbol] localized method name
@@ -22,10 +30,14 @@ module GlobalizedMethod
       end
     end
 
-    def globalized_method(prefix)
+    # @example globalized_method :name, fallbacks: { uk: %i[ru en] }
+    def globalized_method(prefix, fallbacks: {})
       class_eval <<~METHODS, __FILE__, __LINE__ + 1
         def #{prefix}
-          public_send("#{prefix}_" + I18n.locale.to_s)
+          public_send("#{prefix}_" + I18n.locale.to_s).presence || #{fallbacks.merge(GlobalizedMethod.fallbacks)}.fetch(I18n.locale, []).each do |locale|
+            result = public_send("#{prefix}_" + locale.to_s).presence
+            return result if result
+          end.presence
         end
       METHODS
     end

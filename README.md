@@ -7,10 +7,15 @@ gem install globalized_method
 ```
 
 ```ruby
+# set fallbacks globally
+GlobalizedMethod.fallbacks[:ru] = %i[en]
+```
+
+```ruby
 class Item < ApplicationRecord # or BasicObject (works the same)
   include GlobalizedMethod
   
-  globalized_method :name
+  globalized_method :name, fallbacks: { ru: %i[en] }
   
   def name_en
     'some name'

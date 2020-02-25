@@ -1,5 +1,5 @@
 require 'bundler/setup'
-require 'globalize_method'
+require 'globalized_method'
 require 'i18n'
 require 'pry'
 
